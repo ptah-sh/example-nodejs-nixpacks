@@ -1,0 +1,26 @@
+{
+  "name": "example-nodejs-nixpacks",
+  "version": "1.0.0",
+  "description": "Deploy Node.js-based application with Nixpacks",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ptah-sh/example-nodejs-nixpacks.git"
+  },
+  "keywords": [
+    "heroku",
+    "ptah-sh",
+    "docker",
+    "docker swarm",
+    "k8s"
+  ],
+  "author": "Bohdan Shulha <b.shulha@pm.me>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ptah-sh/example-nodejs-nixpacks/issues"
+  },
+  "homepage": "https://github.com/ptah-sh/example-nodejs-nixpacks#readme"
+}

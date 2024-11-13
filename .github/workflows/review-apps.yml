@@ -1,0 +1,38 @@
+on:
+    pull_request:
+      types:
+        - opened
+        - reopened
+        - synchronize
+        - closed
+  
+jobs:
+  deploy-review-app:
+    if: contains(github.actor, fromJson('["bohdan-shulha", "dependabot[bot]", "github-actions[bot]"]'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ptah-sh/deploy-review-app-action@v1.0.0
+        with:
+          apiKey: ${{ secrets.PTAH_API_KEY }}
+          service: example_nodejs_nixpacks
+          ref: ${{ github.event.pull_request.head.ref }}
+          refUrl: ${{ github.event.pull_request.html_url }}
+          process: |
+            - name: myapp
+              envVars:
+                - name: APP_ENV
+                  value: review
+                - name: MESSAGE
+                  value: "Hello from GitHub Actions!\n\n${{ github.event.pull_request.title }}\n\n${{ github.event.pull_request.body }}\n\n${{ github.event.pull_request.head.ref }}"
+              caddy:
+                - targetPort: 80
+                  targetProtocol: http
+                  publishedPort: 80
+                  domain: pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.repo.name }}.ptah.sh
+          worker: |
+            - name: main
+              source:
+                type: git_with_nixpacks
+                nixpacks:
+                  repo: ${{ github.event.pull_request.head.repo.git_url }}
+                  ref: ${{ github.event.pull_request.head.ref }}
