@@ -5,34 +5,35 @@ on:
         - reopened
         - synchronize
         - closed
-  
+
 jobs:
   deploy-review-app:
-    if: contains(github.actor, fromJson('["bohdan-shulha", "dependabot[bot]", "github-actions[bot]"]'))
     runs-on: ubuntu-latest
     steps:
-      - uses: ptah-sh/deploy-review-app-action@v1.0.0
+      - uses: ptah-sh/deploy-review-app-action@v1.1.1
         with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
           apiKey: ${{ secrets.PTAH_API_KEY }}
-          service: example_nodejs_nixpacks
+          service: example_nodejs_nixpacks_creative_rabbit_60
           ref: ${{ github.event.pull_request.head.ref }}
           refUrl: ${{ github.event.pull_request.html_url }}
           process: |
-            - name: myapp
-              envVars:
-                - name: APP_ENV
-                  value: review
-                - name: MESSAGE
-                  value: "Hello from GitHub Actions!\n\n${{ github.event.pull_request.title }}\n\n${{ github.event.pull_request.body }}\n\n${{ github.event.pull_request.head.ref }}"
-              caddy:
-                - targetPort: 80
-                  targetProtocol: http
-                  publishedPort: 80
-                  domain: pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.repo.name }}.ptah.sh
+            name: myapp
+            envVars:
+              - name: APP_ENV
+                value: review
+              - name: MESSAGE
+                value: "Hello from GitHub Actions!\n\n${{ github.event.pull_request.title }}\n\n${{ github.event.pull_request.body }}\n\n${{ github.event.pull_request.head.ref }}"
+            caddy:
+              - targetPort: 3000
+                targetProtocol: http
+                publishedPort: 443
+                path: /*
+                domain: pr-${{ github.event.pull_request.number }}-example-nodejs-nixpacks.ptah.sh
           worker: |
-            - name: main
-              source:
-                type: git_with_nixpacks
-                nixpacks:
-                  repo: ${{ github.event.pull_request.head.repo.git_url }}
+            name: main
+            source:
+              type: git_with_nixpacks
+              nixpacks:
+                  repo: git@github.com:${{ github.event.pull_request.head.repo.owner.login }}/${{ github.event.pull_request.head.repo.name }}.git
                   ref: ${{ github.event.pull_request.head.ref }}
